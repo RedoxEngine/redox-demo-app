@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<%- include ("layout") -%>
+
+    <body>
+        <div class="container">
+            <h1 class="display-5">Healthcare Data Workflows</h1>
+            <p>A lightweight application to demonstrate common healthcare integration workflows with the Redox.</p>
+
+            <div class="card" style="width: 45rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Find Patient</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Search for a patient's medical record in an EHR.</h6>
+                    </p>
+                    <a href="/patient-search" class="btn btn-primary">Find a Patient</a>
+                </div>
+            </div>
+
+            <div class="card" style="width: 45rem;">
+                <div class="card-body">
+                    <h5 class="card-title">New Patient</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Request a new patient record be created in an EHR with intial demographic data.</h6>
+                    </p>
+                    <a href="/patient-create" class="btn btn-primary">Create a Patient</a>
+                </div>
+            </div>
+
+            <div class="card" style="width: 45rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Clinical Summary</h5>
+                    <p class="card-text">Request a patient clinical summary document from an EHR. This contains a core set of clinical data elements from a patient's medical history.
+                    </p>
+                    <a href="/ccd" class="btn btn-primary disabled">Get Patient Summary</a>
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>

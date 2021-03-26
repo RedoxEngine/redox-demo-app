@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<%- include ("layout") -%>
+
+    <body>
+        <div class="container">
+            <br />
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <h5>Search</h5>
+
+                    <form name="patient-search" method="post" style="width: 20rem;">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" value="<%= search.firstName %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" value="<%= search.lastName %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dob" class="form-label">Date of birth</label>
+                            <input type="date" class="form-control" name="dob" value="<%= search.dob %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" name="gender">
+                                <option selected></option>
+                                <option value="Female" <%=search.gender==='Female' ? 'selected' : '' %>>Female</option>
+                                <option value="Male" <%=search.gender==='Male' ? 'selected' : '' %>>Male</option>
+                                <option value="Other" <%=search.gender==='Other' ? 'selected' : '' %>>Other</option>
+                                <option value="Unknown" <%=search.gender==='Unknown' ? 'selected' : '' %>>Unknown
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" formaction="/patient-search">Search</button>
+                        <button type="submit" class="btn btn-danger" formaction="/patient-create">Create</button>
+                    </form>
+
+                </div>
+                <div class="col-8">
+                    <h5>Results</h5>
+                    <% if (errorMessage) { %>
+                        <%= errorMessage %>
+                            <% } %>
+
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Chart ID</th>
+                                            <th scope="col">First</th>
+                                            <th scope="col">Last</th>
+                                            <th scope="col">DOB</th>
+                                            <th scope="col">Gender</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Phone</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (results && results.Patients) { results.Patients.forEach(function(patient) { %>
+                                            <tr>
+                                                <th scope="row"><%= patient.Identifiers[0].ID %></th>
+                                                <td><%= patient.Demographics.FirstName %></td>
+                                                <td><%= patient.Demographics.LastName%></td>
+                                                <td><%=patient.Demographics.DOB%></td>
+                                                <td><%=patient.Demographics.Sex%></td>
+                                                <td><%=patient.Demographics.Address.StreetAddress%></td>
+                                                <td><%=patient.Demographics.PhoneNumber.Home%></td>
+                                                <td><a href="/ccd/<%= patient.Identifiers[0].ID %>" class="btn btn-primary">View</a></td>
+                                            </tr>
+                                            <% }) } %>
+                                    </tbody>
+                                </table>
+                                <!-- 
+                    <h7>Raw Response</h7>
+                    <div id="editor">
+                        <%= JSON.stringify(results) %>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+        <style>
+            #editor {
+                position: relative;
+                height: 400px;
+                width: 100%;
+            }
+        </style>
+        <script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"
+            integrity="sha256-z3YWAUWq4ZqhJwjqxdTFwmXUOkEPpQUpdxWHCZVADA4=" crossorigin="anonymous"></script>
+        <script>
+            var beautify = ace.require("ace/ext/beautify");
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/github");
+            editor.session.setMode("ace/mode/json");
+            editor.getSession().setValue(js_beautify(editor.getValue(), {
+                indent_size: 2
+            }));</script>
+    </body>
+
+</html>
