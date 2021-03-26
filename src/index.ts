@@ -3,7 +3,7 @@ import path from "path";
 import * as routes from "./routes";
 
 const app = express(); 
-const port = 8080; // default port to listen
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -20,5 +20,5 @@ routes.register(app);
 // start the express server
 app.listen(port, () => {
     // tslint:disable-next-line:no-console
-    console.log(`server started at http://localhost:${port}`);
+    console.log(`server started`);
 });
