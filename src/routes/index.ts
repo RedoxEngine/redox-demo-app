@@ -1,5 +1,5 @@
 import * as express from "express";
-import { patientSearch, patientCreate } from './redox';
+import { patientSearch, patientCreate, ccdSearch, ccdView } from './redox';
 
 export const register = (app: express.Application) => {
     // define a route handler for the default home page
@@ -41,6 +41,40 @@ export const register = (app: express.Application) => {
             console.log(e);
         }
         res.render('patient', {
+            search: req.body,
+            results,
+            errorMessage
+        });
+    });
+    app.get("/ccd", (req, res) => {
+        res.render("ccd", { search: {}, results: {}, errorMessage: '' });
+    });
+    app.post('/ccd', async (req, res) => {
+        let results, errorMessage = '';
+        try {
+            results = await ccdSearch(req.body);
+        } catch (e) {
+            errorMessage = e.message
+            console.log(e);
+        }
+        res.render('ccd', {
+            search: req.body,
+            results,
+            errorMessage
+        });
+    });
+    app.get("/ccd-view", (req, res) => {
+        res.render("ccd-view", { search: {}, results: {}, errorMessage: '' });
+    });
+    app.post('/ccd-view', async (req, res) => {
+        let results, errorMessage = '';
+        try {
+            results = await ccdView(req.body);
+        } catch (e) {
+            errorMessage = e.message
+            console.log(e);
+        }
+        res.render('ccd-view', {
             search: req.body,
             results,
             errorMessage

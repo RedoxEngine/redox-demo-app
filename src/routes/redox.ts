@@ -1,19 +1,27 @@
 import axios from 'axios';
 
-var REDOX_API_KEY = process.env.API_KEY; 
-var REDOX_API_SECRET = process.env.API_SECRET; 
+var REDOX_API_KEY = '4fee8c55-66b6-4bd4-a719-7b78775351c4'; 
+var REDOX_API_SECRET = 'KXpJMCGsh8nJiVLTUpL0NF9Hm337aYkfjFE7RYAMUjb2bU8IIAcg53iSmKDlNtm0IAnyPy6g'; 
 var REDOX_AUTH_URL = 'https://api.redoxengine.com/auth/authenticate';
 var REDOX_API_URL = 'https://api.redoxengine.com/endpoint';
 
-const destinationId = 'aebb3691-ef33-4bc0-ba84-e0a90b1dffb2';
+const destinationId = '1ca254a8-8d42-4593-abb4-b21399d9de57';
 
 interface RequestParams {
     firstName: string;
     lastName: string;
     dob: string;
     gender: string;
+    email: string;
+    address: string;
+    city: string;
+    zip: string;
+    state: string;
     apiKey: string;
     apiSecret: string;
+    patientid: string;
+    organization: string;
+    docid: string;
 }
 
 export const getAccessToken = async (params: RequestParams) => {
@@ -61,30 +69,40 @@ export const patientSearch = async (searchParams: RequestParams) => {
                     "ID": destinationId,
                 }
             ],
-
-            // TODO: Carequality 
-            // "FacilityCode": "2.16.840.1.113883.3.651",
-            // "Extensions": {
-            //     "sender-organization-id": {
-            //         "string": "urn:oid:{{Your base OID here}}.{{facility number}}"
-            //     },
-            //     "user-id": {
-            //         "string": "Doolittle, John"
-            //     },
-            //     "user-role": {
-            //         "coding": {
-            //             "code": "112247003",
-            //             "display": "Medical Doctor"
-            //         }
-            //     }
-            // }
+            "FacilityCode": searchParams.organization,
+            "Extensions": {
+                "sender-organization-id": {
+                    "string": "2.16.840.1.113883.3.6147.458.8731.2.1"
+                },
+                "user-id": {
+                    "string": "Doolittle, John"
+                },
+                "user-role": {
+                    "coding": {
+                        "code": "112247003",
+                        "display": "Medical Doctor"
+                    }
+                },
+                "purpose-of-use": {
+                    "coding": {
+                      "code": "TREATMENT"
+                    }
+            }
+        }
         },
         Patient: {
             "Demographics": {
                 "FirstName": searchParams.firstName,
                 "LastName": searchParams.lastName,
                 "DOB": searchParams.dob,
-                "Sex": searchParams.gender
+                "Sex": searchParams.gender,
+                "EmailAddresses": [searchParams.email],
+                "Address": {
+                    "StreetAddress": searchParams.address,
+                    "City" : searchParams.city,
+                    "State": searchParams.state,
+                    "ZIP": searchParams.zip
+                }
             }
         }
     }
@@ -115,9 +133,12 @@ export const patientCreate =async (searchParams: RequestParams) => {
                 "LastName": searchParams.lastName,
                 "DOB": searchParams.dob,
                 "Sex": searchParams.gender,
+                "EmailAddresses": [searchParams.email],
                 "Address": {
-                    "State": "WI",
-                    "ZIP": 12345
+                    "StreetAddress": searchParams.address,
+                    "City" : searchParams.city,
+                    "State": searchParams.state,
+                    "ZIP": searchParams.zip
                 }
             },
             "PCP": {
@@ -131,3 +152,94 @@ export const patientCreate =async (searchParams: RequestParams) => {
     const results = await postToRedox(searchParams, dm);
     return results;
 }
+
+export const ccdSearch = async (searchParams: RequestParams) => {
+
+    const dm = {
+        Meta: {
+            "DataModel": "Clinical Summary",
+            "EventType": "DocumentQuery",
+            "EventDateTime": new Date().toISOString(),
+            "Test": true,
+            "Destinations": [
+                {
+                    "ID": 'ec745338-8849-43ad-a7ce-4bc5bf1d8b89',
+                }
+            ],
+            "FacilityCode": searchParams.organization,
+            "Extensions": {
+                "sender-organization-id": {
+                    "string": "2.16.840.1.113883.3.6147.458.8731.2.1"
+                },
+                "user-id": {
+                    "string": "Doolittle, John"
+                },
+                "user-role": {
+                    "coding": {
+                        "code": "112247003",
+                        "display": "Medical Doctor"
+                    }
+                },
+                "purpose-of-use": {
+                    "coding": {
+                      "code": "TREATMENT"
+                    }
+            }
+        }
+        },
+        Patient: {
+            "Identifiers": [{
+                "ID": searchParams.patientid,
+                "IDType": searchParams.organization
+            }
+            ]
+            }
+        }
+    
+    const results = await postToRedox(searchParams, dm);
+    return results;
+}
+
+export const ccdView = async (searchParams: RequestParams) => {
+
+    const dm = {
+        Meta: {
+            "DataModel": "Clinical Summary",
+            "EventType": "DocumentGet",
+            "EventDateTime": new Date().toISOString(),
+            "Test": true,
+            "Destinations": [
+                {
+                    "ID": 'ec745338-8849-43ad-a7ce-4bc5bf1d8b89',
+                }
+            ],
+            "FacilityCode": searchParams.organization,
+            "Extensions": {
+                "sender-organization-id": {
+                    "string": "2.16.840.1.113883.3.6147.458.8731.2.1"
+                },
+                "user-id": {
+                    "string": "Doolittle, John"
+                },
+                "user-role": {
+                    "coding": {
+                        "code": "112247003",
+                        "display": "Medical Doctor"
+                    }
+                },
+                "purpose-of-use": {
+                    "coding": {
+                      "code": "TREATMENT"
+                    }
+            }
+        }
+        },
+        Document: {
+                "ID": searchParams.docid
+            }
+        }
+    
+    const results = await postToRedox(searchParams, dm);
+    return results;
+}
+

@@ -11,6 +11,16 @@
 
                     <form name="patient-search" method="post" style="width: 20rem;">
                         <div class="mb-3">
+                            <label for="organization" class="form-label">Organization</label>
+                            <select class="form-select" name="organization">
+                                <option selected></option>
+                                <option value="2.16.840.1.113883.3.6147.458.2" <%=search.organization==='2.16.840.1.113883.3.6147.458.2' ? 'selected' : '' %>>Redox Record Locator Service</option>
+                                <option value="1.2.840.114350.1.13.0.1.7.3.688884.100" <%=search.organization==='1.2.840.114350.1.13.0.1.7.3.688884.100' ? 'selected' : '' %>>Epic</option>
+                                <option value="2.16.840.1.113883.3.651" <%=search.organization==='2.16.840.1.113883.3.651' ? 'selected' : '' %>>CRISP</option>
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="firstName" class="form-label">First Name</label>
                             <input type="text" class="form-control" name="firstName" value="<%= search.firstName %>">
                         </div>
@@ -33,6 +43,26 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="<%= search.email %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" name="address" value="<%= search.address %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" value="<%= search.city %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" name="state" value="<%= search.state %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="zip" class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" name="zip" value="<%= search.zip %>">
+                        </div>
                         <button type="submit" class="btn btn-primary" formaction="/patient-search">Search</button>
                         <button type="submit" class="btn btn-danger" formaction="/patient-create">Create</button>
                     </form>
@@ -47,7 +77,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Chart ID</th>
+                                            <th scope="col">Patient ID</th>
                                             <th scope="col">First</th>
                                             <th scope="col">Last</th>
                                             <th scope="col">DOB</th>
@@ -67,9 +97,21 @@
                                                 <td><%=patient.Demographics.Sex%></td>
                                                 <td><%=patient.Demographics.Address.StreetAddress%></td>
                                                 <td><%=patient.Demographics.PhoneNumber.Home%></td>
-                                                <td><a href="/ccd/<%= patient.Identifiers[0].ID %>" class="btn btn-primary">View</a></td>
+                                                <td><a href="/ccd" class="btn btn-primary">View</a></td>
                                             </tr>
                                             <% }) } %>
+                                            <% if (results && results.Patient) { %>
+                                                <tr>
+                                                    <th scope="row"><%= results.Patient.Identifiers[0].ID %></th>
+                                                    <td><%= results.Patient.Demographics.FirstName %></td>
+                                                    <td><%= results.Patient.Demographics.LastName%></td>
+                                                    <td><%=results.Patient.Demographics.DOB%></td>
+                                                    <td><%=results.Patient.Demographics.Sex%></td>
+                                                    <td><%=results.Patient.Demographics.Address.StreetAddress%></td>
+                                                    <td><%=results.Patient.Demographics.PhoneNumber.Home%></td>
+                                                    <td><a href="/ccd" class="btn btn-primary">View</a></td>
+                                                </tr>
+                                                <% } %>
                                     </tbody>
                                 </table>
                                 <!-- 
