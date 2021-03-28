@@ -1,5 +1,9 @@
 import * as express from "express";
-import { patientSearch, patientCreate, ccdSearch, ccdView } from './redox';
+import { ccdSearch } from './redox';
+import { patientSearch } from './redox/patientSearch';
+import { patientCreate } from './redox/patientCreate';
+import { ccdView } from './redox/getPatientClinicalSummary';
+
 
 export const register = (app: express.Application) => {
     // define a route handler for the default home page
@@ -46,38 +50,50 @@ export const register = (app: express.Application) => {
             errorMessage
         });
     });
-    app.get("/ccd", (req, res) => {
-        res.render("ccd", { search: {}, results: {}, errorMessage: '' });
-    });
-    app.post('/ccd', async (req, res) => {
+
+    app.get('/clinicalsummary/:destinationid/:patientid', async (req, res) => {
         let results, errorMessage = '';
         try {
-            results = await ccdSearch(req.body);
+            results = await ccdView(req.params.destinationid, req.params.patientid);
         } catch (e) {
             errorMessage = e.message
             console.log(e);
         }
-        res.render('ccd', {
-            search: req.body,
-            results,
-            errorMessage
-        });
+        res.render("clinicalsummary", { xml: results, errorMessage: '' });
     });
-    app.get("/ccd-view", (req, res) => {
-        res.render("ccd-view", { search: {}, results: {}, errorMessage: '' });
-    });
-    app.post('/ccd-view', async (req, res) => {
-        let results, errorMessage = '';
-        try {
-            results = await ccdView(req.body);
-        } catch (e) {
-            errorMessage = e.message
-            console.log(e);
-        }
-        res.render('ccd-view', {
-            search: req.body,
-            results,
-            errorMessage
-        });
-    });
+
+    // app.get("/ccd", (req, res) => {
+    //     res.render("ccd", { search: {}, results: {}, errorMessage: '' });
+    // });
+    // app.post('/ccd', async (req, res) => {
+    //     let results, errorMessage = '';
+    //     try {
+    //         results = await ccdSearch(req.body);
+    //     } catch (e) {
+    //         errorMessage = e.message
+    //         console.log(e);
+    //     }
+    //     res.render('ccd', {
+    //         search: req.body,
+    //         results,
+    //         errorMessage
+    //     });
+    // });
+    // app.get("/ccd-view", (req, res) => {
+    //     res.render("ccd-view", { search: {}, results: {}, errorMessage: '' });
+    // });
+    // app.post('/ccd-view', async (req, res) => {
+    //     let results, errorMessage = '';
+    //     try {
+    //         results = await ccdView(req.body);
+    //     } catch (e) {
+    //         errorMessage = e.message
+    //         console.log(e);
+    //     }
+    //     res.render('ccd-view', {
+    //         search: req.body,
+    //         results,
+    //         errorMessage
+    //     });
+    // });
 };

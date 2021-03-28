@@ -12,11 +12,18 @@
                     <form name="patient-search" method="post" style="width: 20rem;">
                         <div class="mb-3">
                             <label for="organization" class="form-label">Organization</label>
-                            <select class="form-select" name="organization">
+                            <select class="form-select" name="destinationId">
                                 <option selected></option>
-                                <option value="2.16.840.1.113883.3.6147.458.2" <%=search.organization==='2.16.840.1.113883.3.6147.458.2' ? 'selected' : '' %>>Redox Record Locator Service</option>
-                                <option value="1.2.840.114350.1.13.0.1.7.3.688884.100" <%=search.organization==='1.2.840.114350.1.13.0.1.7.3.688884.100' ? 'selected' : '' %>>Epic</option>
-                                <option value="2.16.840.1.113883.3.651" <%=search.organization==='2.16.840.1.113883.3.651' ? 'selected' : '' %>>CRISP</option>
+                                <option value="2.16.840.1.113883.3.6147.458.2" <%=search.destinationId==='2.16.840.1.113883.3.6147.458.2' ? 'selected'
+                                    : '' %>
+                                    >Redox Record Locator Service</option>
+                                <option value="1.2.840.114350.1.13.0.1.7.3.688884.100"
+                                    <%=search.destinationId==='1.2.840.114350.1.13.0.1.7.3.688884.100' ? 'selected' : '' %>>Epic</option>
+                                <option value="2.16.840.1.113883.3.651" <%=search.destinationId==='2.16.840.1.113883.3.651' ? 'selected' : '' %>>CRISP
+                                </option>
+                                <option value="aebb3691-ef33-4bc0-ba84-e0a90b1dffb2" <%=search.destinationId==='aebb3691-ef33-4bc0-ba84-e0a90b1dffb2'
+                                    ? 'selected' : '' %>>DrChrono
+                                </option>
                                 </option>
                             </select>
                         </div>
@@ -73,48 +80,56 @@
                     <% if (errorMessage) { %>
                         <%= errorMessage %>
                             <% } %>
-
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Patient ID</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">DOB</th>
-                                            <th scope="col">Gender</th>
-                                            <th scope="col">Address</th>
-                                            <th scope="col">Phone</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (results && results.Patients) { results.Patients.forEach(function(patient) { %>
-                                            <tr>
-                                                <th scope="row"><%= patient.Identifiers[0].ID %></th>
-                                                <td><%= patient.Demographics.FirstName %></td>
-                                                <td><%= patient.Demographics.LastName%></td>
-                                                <td><%=patient.Demographics.DOB%></td>
-                                                <td><%=patient.Demographics.Sex%></td>
-                                                <td><%=patient.Demographics.Address.StreetAddress%></td>
-                                                <td><%=patient.Demographics.PhoneNumber.Home%></td>
-                                                <td><a href="/ccd" class="btn btn-primary">View</a></td>
-                                            </tr>
-                                            <% }) } %>
-                                            <% if (results && results.Patient) { %>
+                                <% if (results && results.Patients && results.Patients.length===0) { %>
+                                    No patients found matching search criteria.
+                                    <% } else { %>
+                                        <table class="table">
+                                            <thead>
                                                 <tr>
-                                                    <th scope="row"><%= results.Patient.Identifiers[0].ID %></th>
-                                                    <td><%= results.Patient.Demographics.FirstName %></td>
-                                                    <td><%= results.Patient.Demographics.LastName%></td>
-                                                    <td><%=results.Patient.Demographics.DOB%></td>
-                                                    <td><%=results.Patient.Demographics.Sex%></td>
-                                                    <td><%=results.Patient.Demographics.Address.StreetAddress%></td>
-                                                    <td><%=results.Patient.Demographics.PhoneNumber.Home%></td>
-                                                    <td><a href="/ccd" class="btn btn-primary">View</a></td>
+                                                    <th scope="col">Patient ID</th>
+                                                    <th scope="col">First</th>
+                                                    <th scope="col">Last</th>
+                                                    <th scope="col">DOB</th>
+                                                    <th scope="col">Gender</th>
+                                                    <th scope="col">Address</th>
+                                                    <th scope="col">Phone</th>
+                                                    <th scope="col"></th>
                                                 </tr>
-                                                <% } %>
-                                    </tbody>
-                                </table>
-                                <!-- 
+                                            </thead>
+                                            <tbody>
+                                                <% if (results && results.Patients) { results.Patients.forEach(function(patient) { %>
+                                                    <tr>
+                                                        <th scope="row">
+                                                            <%= patient.Identifiers[0].ID %>
+                                                        </th>
+                                                        <td>
+                                                            <%= patient.Demographics.FirstName %>
+                                                        </td>
+                                                        <td>
+                                                            <%= patient.Demographics.LastName%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.DOB%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.Sex%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.Address.StreetAddress%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.PhoneNumber.Home%>
+                                                        </td>
+                                                        <td><a href="/clinicalsummary/<%= search.destinationId %>/<%= patient.Identifiers[0].ID %>"
+                                                                class="btn btn-primary">View</a></td>
+                                                    </tr>
+                                                    <% }) } %>
+
+
+                                            </tbody>
+                                        </table>
+                                        <% } %>
+                                            <!-- 
                     <h7>Raw Response</h7>
                     <div id="editor">
                         <%= JSON.stringify(results) %>

@@ -1,0 +1,65 @@
+<html>
+<%- include ("layout") -%>
+
+    <head>
+        <script>
+            function loadXML(path, callback) {
+                var request;
+                if (window.XMLHttpRequest) {
+                    request = new XMLHttpRequest();
+                } else if (window.ActiveXObject) {
+                    try {
+                        request = new ActiveXObject("Msxml2.XMLHTTP");
+                    } catch (e1) {
+                        try {
+                            request = new ActiveXObject("Microsoft.XMLHTTP");
+                        } catch (e2) {
+                        }
+                    }
+                }
+
+                if (!request) {
+                    window.alert("No ajax support.");
+                    return false;
+                }
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        if (request.status === 200) {
+                            callback(request.responseXML);
+                        } else {
+                            window.alert("Could not load " + path);
+                        }
+                    }
+                };
+
+                request.open("GET", path);
+                request.send();
+            }
+
+            function loadCDA() {
+                var stringXML = `<%- xml %>`
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(stringXML, "application/xml");
+
+                loadXML('../../CDA.xsl', function (xsl) {
+                    result = new XSLTProcessor();
+                    result.importStylesheet(xsl);
+                    result = result.transformToDocument(xml);
+
+                    // document.getElementById("cda").appendChild(result.documentElement);
+                    var iframe = document.getElementById("cda");
+                    iframe.contentWindow.document.open();
+                    iframe.contentWindow.document.write(result.documentElement.outerHTML);
+                    iframe.contentWindow.document.close();
+                });
+            }
+        </script>
+    </head>
+
+
+    <body onload="loadCDA()">
+        <iframe id='cda' style="height: 95%; width:100%; border:none"> </iframe>
+    </body>
+
+</html>
