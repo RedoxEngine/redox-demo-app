@@ -1,8 +1,7 @@
 import * as express from "express";
-import { ccdSearch } from './redox';
 import { patientSearch } from './redox/patientSearch';
 import { patientCreate } from './redox/patientCreate';
-import { ccdView } from './redox/getPatientClinicalSummary';
+import { getClinicalSummary } from './redox/getPatientClinicalSummary';
 
 
 export const register = (app: express.Application) => {
@@ -54,46 +53,11 @@ export const register = (app: express.Application) => {
     app.get('/clinicalsummary/:destinationid/:patientid', async (req, res) => {
         let results, errorMessage = '';
         try {
-            results = await ccdView(req.params.destinationid, req.params.patientid);
+            results = await getClinicalSummary(req.params.destinationid, req.params.patientid);
         } catch (e) {
             errorMessage = e.message
             console.log(e);
         }
         res.render("clinicalsummary", { xml: results, errorMessage: '' });
     });
-
-    // app.get("/ccd", (req, res) => {
-    //     res.render("ccd", { search: {}, results: {}, errorMessage: '' });
-    // });
-    // app.post('/ccd', async (req, res) => {
-    //     let results, errorMessage = '';
-    //     try {
-    //         results = await ccdSearch(req.body);
-    //     } catch (e) {
-    //         errorMessage = e.message
-    //         console.log(e);
-    //     }
-    //     res.render('ccd', {
-    //         search: req.body,
-    //         results,
-    //         errorMessage
-    //     });
-    // });
-    // app.get("/ccd-view", (req, res) => {
-    //     res.render("ccd-view", { search: {}, results: {}, errorMessage: '' });
-    // });
-    // app.post('/ccd-view', async (req, res) => {
-    //     let results, errorMessage = '';
-    //     try {
-    //         results = await ccdView(req.body);
-    //     } catch (e) {
-    //         errorMessage = e.message
-    //         console.log(e);
-    //     }
-    //     res.render('ccd-view', {
-    //         search: req.body,
-    //         results,
-    //         errorMessage
-    //     });
-    // });
 };

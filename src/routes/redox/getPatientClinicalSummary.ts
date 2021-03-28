@@ -1,7 +1,7 @@
 import { PatientParams, postToRedox } from '.'
 import xmlFormatter from 'xml-formatter';
 
-export const ccdView = async (destinationid: string, patientid: string) => {
+export const getClinicalSummary = async (destinationid: string, patientid: string) => {
     destinationid = destinationid === 'aebb3691-ef33-4bc0-ba84-e0a90b1dffb2' ?
         '9652c03c-6e29-4bac-a4cc-1b003d2ab962' : destinationid;
 
@@ -47,7 +47,6 @@ export const ccdView = async (destinationid: string, patientid: string) => {
     try {
         const results = await postToRedox(dm);
         return xmlFormatter(results.Data);
-        // return { Data: xmlFormatter(ccd) };
     } catch {
         return {};
     }
