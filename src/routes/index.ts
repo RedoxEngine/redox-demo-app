@@ -1,5 +1,8 @@
 import * as express from "express";
-import { patientSearch, patientCreate } from './redox';
+import { patientSearch } from './redox/patientSearch';
+import { patientCreate } from './redox/patientCreate';
+import { getClinicalSummary } from './redox/getPatientClinicalSummary';
+
 
 export const register = (app: express.Application) => {
     // define a route handler for the default home page
@@ -45,5 +48,16 @@ export const register = (app: express.Application) => {
             results,
             errorMessage
         });
+    });
+
+    app.get('/clinicalsummary/:destinationid/:patientid', async (req, res) => {
+        let results, errorMessage = '';
+        try {
+            results = await getClinicalSummary(req.params.destinationid, req.params.patientid);
+        } catch (e) {
+            errorMessage = e.message
+            console.log(e);
+        }
+        res.render("clinicalsummary", { xml: results, errorMessage: '' });
     });
 };

@@ -11,6 +11,14 @@
 
                     <form name="patient-search" method="post" style="width: 20rem;">
                         <div class="mb-3">
+                            <label for="organization" class="form-label">Organization</label>
+                            <select class="form-select" name="destinationId">
+                                <option value="aebb3691-ef33-4bc0-ba84-e0a90b1dffb2" <%=search.destinationId==='aebb3691-ef33-4bc0-ba84-e0a90b1dffb2'
+                                    ? 'selected' : '' %>>DrChrono
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="firstName" class="form-label">First Name</label>
                             <input type="text" class="form-control" name="firstName" value="<%= search.firstName %>">
                         </div>
@@ -33,6 +41,26 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="<%= search.email %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" name="address" value="<%= search.address %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" value="<%= search.city %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" name="state" value="<%= search.state %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="zip" class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" name="zip" value="<%= search.zip %>">
+                        </div>
                         <button type="submit" class="btn btn-primary" formaction="/patient-search">Search</button>
                         <button type="submit" class="btn btn-danger" formaction="/patient-create">Create</button>
                     </form>
@@ -43,36 +71,56 @@
                     <% if (errorMessage) { %>
                         <%= errorMessage %>
                             <% } %>
+                                <% if (results && results.Patients && results.Patients.length===0) { %>
+                                    No patients found matching search criteria.
+                                    <% } else { %>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Patient ID</th>
+                                                    <th scope="col">First</th>
+                                                    <th scope="col">Last</th>
+                                                    <th scope="col">DOB</th>
+                                                    <th scope="col">Gender</th>
+                                                    <th scope="col">Address</th>
+                                                    <th scope="col">Phone</th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (results && results.Patients) { results.Patients.forEach(function(patient) { %>
+                                                    <tr>
+                                                        <th scope="row">
+                                                            <%= patient.Identifiers[0].ID %>
+                                                        </th>
+                                                        <td>
+                                                            <%= patient.Demographics.FirstName %>
+                                                        </td>
+                                                        <td>
+                                                            <%= patient.Demographics.LastName%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.DOB%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.Sex%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.Address.StreetAddress%>
+                                                        </td>
+                                                        <td>
+                                                            <%=patient.Demographics.PhoneNumber.Home%>
+                                                        </td>
+                                                        <td><a href="/clinicalsummary/<%= search.destinationId %>/<%= patient.Identifiers[0].ID %>"
+                                                                class="btn btn-primary">View</a></td>
+                                                    </tr>
+                                                    <% }) } %>
 
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Chart ID</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">DOB</th>
-                                            <th scope="col">Gender</th>
-                                            <th scope="col">Address</th>
-                                            <th scope="col">Phone</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (results && results.Patients) { results.Patients.forEach(function(patient) { %>
-                                            <tr>
-                                                <th scope="row"><%= patient.Identifiers[0].ID %></th>
-                                                <td><%= patient.Demographics.FirstName %></td>
-                                                <td><%= patient.Demographics.LastName%></td>
-                                                <td><%=patient.Demographics.DOB%></td>
-                                                <td><%=patient.Demographics.Sex%></td>
-                                                <td><%=patient.Demographics.Address.StreetAddress%></td>
-                                                <td><%=patient.Demographics.PhoneNumber.Home%></td>
-                                                <td><a href="/ccd/<%= patient.Identifiers[0].ID %>" class="btn btn-primary">View</a></td>
-                                            </tr>
-                                            <% }) } %>
-                                    </tbody>
-                                </table>
-                                <!-- 
+
+                                            </tbody>
+                                        </table>
+                                        <% } %>
+                                            <!-- 
                     <h7>Raw Response</h7>
                     <div id="editor">
                         <%= JSON.stringify(results) %>
