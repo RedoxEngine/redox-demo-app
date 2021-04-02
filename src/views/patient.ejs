@@ -61,7 +61,7 @@
                             <label for="zip" class="form-label">ZIP Code</label>
                             <input type="text" class="form-control" name="zip" value="<%= search.zip %>">
                         </div>
-                        <button type="submit" class="btn btn-primary" formaction="/patient-search">Search</button>
+                        <button type="submit" class="btn btn-primary" formaction="/patient">Search</button>
                         <button type="submit" class="btn btn-danger" formaction="/patient-create">Create</button>
                     </form>
 
@@ -69,7 +69,9 @@
                 <div class="col-8">
                     <h5>Results</h5>
                     <% if (errorMessage) { %>
-                        <%= errorMessage %>
+                        <div class="alert alert-danger">
+                             <%= errorMessage %>
+                            </div>
                             <% } %>
                                 <% if (results && results.Patients && results.Patients.length===0) { %>
                                     No patients found matching search criteria.

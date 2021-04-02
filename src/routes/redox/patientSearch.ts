@@ -1,7 +1,6 @@
-import { PatientParams, postToRedox } from '.'
+import { RequestParams, postToRedox } from '.'
 
-export const patientSearch = async (searchParams: PatientParams) => {
-
+export const patientSearch = (requestParams: RequestParams) => {
     const dm = {
         Meta: {
             "DataModel": "PatientSearch",
@@ -10,10 +9,10 @@ export const patientSearch = async (searchParams: PatientParams) => {
             "Test": true,
             "Destinations": [
                 {
-                    "ID": searchParams.destinationId,
+                    "ID": requestParams.destinationid,
                 }
             ],
-            // "FacilityCode": searchParams.organization,
+            // "FacilityCode": requestParams.organization,
             "Extensions": {
                 "sender-organization-id": {
                     "string": "2.16.840.1.113883.3.6147.458.8731.2.1"
@@ -36,23 +35,20 @@ export const patientSearch = async (searchParams: PatientParams) => {
         },
         Patient: {
             "Demographics": {
-                "FirstName": searchParams.firstName,
-                "LastName": searchParams.lastName,
-                "DOB": searchParams.dob,
-                "Sex": searchParams.gender,
-                "EmailAddresses": [searchParams.email],
+                "FirstName": requestParams.firstName,
+                "LastName": requestParams.lastName,
+                "DOB": requestParams.dob,
+                "Sex": requestParams.gender,
+                "EmailAddresses": [requestParams.email],
                 "Address": {
-                    "StreetAddress": searchParams.address,
-                    "City": searchParams.city,
-                    "State": searchParams.state,
-                    "ZIP": searchParams.zip
+                    "StreetAddress": requestParams.address,
+                    "City": requestParams.city,
+                    "State": requestParams.state,
+                    "ZIP": requestParams.zip
                 }
             }
         }
     }
-    const results = await postToRedox(dm);
-    if (results && results.Patient) {
-        results.Patients = [results.Patient];
-    }
-    return results;
+
+    return dm;
 }
