@@ -12,10 +12,12 @@
                     <form name="patient-search" method="post" style="width: 20rem;">
                         <div class="mb-3">
                             <label for="organization" class="form-label">Organization</label>
-                            <select class="form-select" name="destinationId">
-                                <option value="aebb3691-ef33-4bc0-ba84-e0a90b1dffb2" <%=search.destinationId==='aebb3691-ef33-4bc0-ba84-e0a90b1dffb2'
-                                    ? 'selected' : '' %>>DrChrono
-                                </option>
+                            <select class="form-select" name="destinationid">
+                                <% if (destinations) { destinations.forEach(function(destination) { %>
+                                    <option value="<%=destination.id%>" <%=search.destinationid===destination.id ? 'selected' : '' %>>
+                                        <%= destination.name %>
+                                    </option>
+                                <% }) } %>
                             </select>
                         </div>
                         <div class="mb-3">

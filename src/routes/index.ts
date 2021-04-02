@@ -31,10 +31,11 @@ export const register = (app: express.Application) => {
     });
 
     app.get("/patient", async (req, res) => {
-        res.render("patient", { destinations: {}, search: {}, results: {}, errorMessage: '' });
+        res.render("patient", { destinations: req.session.destinations, search: {}, results: {}, errorMessage: '' });
     });
     app.post('/patient', async (req, res) => {
         let results, errorMessage;
+
         try {
             results = await postToRedox('patientSearch', req.session.access_token, req.body);
             if (results && results.Patient) {
@@ -43,6 +44,7 @@ export const register = (app: express.Application) => {
         } catch (e) {
             errorMessage = handleError(e);
         }
+
         res.render('patient', {
             destinations: req.session.destinations,
             search: req.body,
@@ -64,6 +66,7 @@ export const register = (app: express.Application) => {
         } catch (e) {
             errorMessage = handleError(e);
         }
+
         res.render('patient', {
             destinations: req.session.destinations,
             search: req.body,
@@ -74,6 +77,7 @@ export const register = (app: express.Application) => {
 
     app.get('/clinicalsummary/:destinationid/:patientid', async (req, res) => {
         let results, errorMessage;
+
         try {
             results = await postToRedox('getClinicalSummary', req.session.access_token, { destinationid: req.params.destinationid, patientid: req.params.patientid });
             console.log(results);
@@ -82,6 +86,7 @@ export const register = (app: express.Application) => {
         } catch (e) {
             errorMessage = handleError(e);
         }
+
         res.render("clinicalsummary", { xml: results, errorMessage });
     });
 
@@ -93,6 +98,7 @@ export const register = (app: express.Application) => {
 
 const handleError = (err: any) => {
     let errorMessage;
+
     if (err.response?.data?.Meta?.Errors?.[0]?.Text) {
         errorMessage = err.response.data.Meta.Errors[0].Text;
     } else {

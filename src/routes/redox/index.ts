@@ -108,13 +108,16 @@ export const getSubscriptions = async () => {
 export const getDestinations = async () => {
     const { response, error } = await getSubscriptions();
 
-    const destinations = response.payload.subscriptions.filter((sub: any) => sub.source.id === process.env.REDOX_SOURCE_ID)
-        .map((sub: any) => {
-            return {
-                datamodel: sub.dataModel,
-                ...sub.destination
-            }
+    let uniq = new Set();
+    let destinations = response.payload.subscriptions
+        .filter((sub) => sub.source.id === process.env.REDOX_SOURCE_ID)
+        .map((sub) => { return { ...sub.destination } })
+        .filter(d => {
+            const uniqVal = !uniq.has(d.id);
+            uniq.add(d.id);
+            return uniqVal;
         });
+
 
     return destinations;
 }
