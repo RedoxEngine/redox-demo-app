@@ -1,4 +1,4 @@
-import { RequestParams, postToRedox } from '.'
+import { RequestParams } from '.'
 
 export const getClinicalSummary = (requestParams: RequestParams) => {
 
@@ -10,7 +10,6 @@ export const getClinicalSummary = (requestParams: RequestParams) => {
             "Test": true,
             "Destinations": [
                 {
-                    // "ID": 'ec745338-8849-43ad-a7ce-4bc5bf1d8b89',
                     "ID": requestParams.destinationid
 
                 }

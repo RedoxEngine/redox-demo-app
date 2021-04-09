@@ -1,4 +1,5 @@
-import { RequestParams, postToRedox } from '.'
+import { RequestParams } from '.'
+import { v4 as uuidv4 } from 'uuid';
 
 export const patientCreate = (requestParams: RequestParams) => {
     const dm = {
@@ -15,8 +16,8 @@ export const patientCreate = (requestParams: RequestParams) => {
         },
         Patient: {
             "Identifiers": [{
-                "ID": 123,
-                "IDType": 123
+                "ID": uuidv4(),
+                "IDType": "Redox Demo App ID"
             }],
             "Demographics": {
                 "FirstName": requestParams.firstName,

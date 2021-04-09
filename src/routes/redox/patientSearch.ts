@@ -1,4 +1,4 @@
-import { RequestParams, postToRedox } from '.'
+import { RequestParams } from '.'
 
 export const patientSearch = (requestParams: RequestParams) => {
     const dm = {

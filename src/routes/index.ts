@@ -80,7 +80,6 @@ export const register = (app: express.Application) => {
 
         try {
             results = await postToRedox('getClinicalSummary', req.session.access_token, { destinationid: req.params.destinationid, patientid: req.params.patientid });
-            console.log(results);
             results = xmlFormatter(results.Data);
 
         } catch (e) {
