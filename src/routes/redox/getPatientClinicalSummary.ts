@@ -1,9 +1,6 @@
-import { PatientParams, postToRedox } from '.'
-import xmlFormatter from 'xml-formatter';
+import { RequestParams } from '.'
 
-export const getClinicalSummary = async (destinationid: string, patientid: string) => {
-    destinationid = destinationid === 'aebb3691-ef33-4bc0-ba84-e0a90b1dffb2' ?
-        '9652c03c-6e29-4bac-a4cc-1b003d2ab962' : destinationid;
+export const getClinicalSummary = (requestParams: RequestParams) => {
 
     const dm = {
         Meta: {
@@ -13,8 +10,7 @@ export const getClinicalSummary = async (destinationid: string, patientid: strin
             "Test": true,
             "Destinations": [
                 {
-                    // "ID": 'ec745338-8849-43ad-a7ce-4bc5bf1d8b89',
-                    "ID": destinationid
+                    "ID": requestParams.destinationid
 
                 }
             ],
@@ -40,15 +36,10 @@ export const getClinicalSummary = async (destinationid: string, patientid: strin
             }
         },
         Document: {
-            "ID": patientid
+            "ID": requestParams.patientid
         }
     }
 
-    try {
-        const results = await postToRedox(dm);
-        return xmlFormatter(results.Data);
-    } catch {
-        return {};
-    }
+    return dm;
 }
 

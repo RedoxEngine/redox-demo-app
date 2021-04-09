@@ -12,10 +12,12 @@
                     <form name="patient-search" method="post" style="width: 20rem;">
                         <div class="mb-3">
                             <label for="organization" class="form-label">Organization</label>
-                            <select class="form-select" name="destinationId">
-                                <option value="aebb3691-ef33-4bc0-ba84-e0a90b1dffb2" <%=search.destinationId==='aebb3691-ef33-4bc0-ba84-e0a90b1dffb2'
-                                    ? 'selected' : '' %>>DrChrono
-                                </option>
+                            <select class="form-select" name="destinationid">
+                                <% if (destinations) { destinations.forEach(function(destination) { %>
+                                    <option value="<%=destination.id%>" <%=search.destinationid===destination.id ? 'selected' : '' %>>
+                                        <%= destination.name %>
+                                    </option>
+                                <% }) } %>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -61,7 +63,7 @@
                             <label for="zip" class="form-label">ZIP Code</label>
                             <input type="text" class="form-control" name="zip" value="<%= search.zip %>">
                         </div>
-                        <button type="submit" class="btn btn-primary" formaction="/patient-search">Search</button>
+                        <button type="submit" class="btn btn-primary" formaction="/patient">Search</button>
                         <button type="submit" class="btn btn-danger" formaction="/patient-create">Create</button>
                     </form>
 
@@ -69,7 +71,9 @@
                 <div class="col-8">
                     <h5>Results</h5>
                     <% if (errorMessage) { %>
-                        <%= errorMessage %>
+                        <div class="alert alert-danger">
+                             <%= errorMessage %>
+                            </div>
                             <% } %>
                                 <% if (results && results.Patients && results.Patients.length===0) { %>
                                     No patients found matching search criteria.
@@ -111,7 +115,7 @@
                                                         <td>
                                                             <%=patient.Demographics.PhoneNumber.Home%>
                                                         </td>
-                                                        <td><a href="/clinicalsummary/<%= search.destinationId %>/<%= patient.Identifiers[0].ID %>"
+                                                        <td><a href="/clinicalsummary/<%= search.destinationid %>/<%= patient.Identifiers[0].ID %>"
                                                                 class="btn btn-primary">View</a></td>
                                                     </tr>
                                                     <% }) } %>

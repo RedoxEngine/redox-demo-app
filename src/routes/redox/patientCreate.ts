@@ -1,6 +1,7 @@
-import { PatientParams, postToRedox } from '.'
+import { RequestParams } from '.'
+import { v4 as uuidv4 } from 'uuid';
 
-export const patientCreate = async (searchParams: PatientParams) => {
+export const patientCreate = (requestParams: RequestParams) => {
     const dm = {
         Meta: {
             "DataModel": "PatientAdmin",
@@ -9,26 +10,26 @@ export const patientCreate = async (searchParams: PatientParams) => {
             "Test": true,
             "Destinations": [
                 {
-                    "ID": searchParams.destinationId
+                    "ID": requestParams.destinationid
                 }
             ]
         },
         Patient: {
             "Identifiers": [{
-                "ID": 123,
-                "IDType": 123
+                "ID": uuidv4(),
+                "IDType": "Redox Demo App ID"
             }],
             "Demographics": {
-                "FirstName": searchParams.firstName,
-                "LastName": searchParams.lastName,
-                "DOB": searchParams.dob,
-                "Sex": searchParams.gender,
-                "EmailAddresses": [searchParams.email],
+                "FirstName": requestParams.firstName,
+                "LastName": requestParams.lastName,
+                "DOB": requestParams.dob,
+                "Sex": requestParams.gender,
+                "EmailAddresses": [requestParams.email],
                 "Address": {
-                    "StreetAddress": searchParams.address,
-                    "City": searchParams.city,
-                    "State": searchParams.state,
-                    "ZIP": searchParams.zip
+                    "StreetAddress": requestParams.address,
+                    "City": requestParams.city,
+                    "State": requestParams.state,
+                    "ZIP": requestParams.zip
                 }
             },
             "PCP": {
@@ -39,6 +40,5 @@ export const patientCreate = async (searchParams: PatientParams) => {
         }
     }
 
-    const results = await postToRedox(dm);
-    return results;
+    return dm;
 }

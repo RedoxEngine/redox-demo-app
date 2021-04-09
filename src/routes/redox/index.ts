@@ -1,44 +1,53 @@
 import axios from 'axios';
+import qs from 'qs';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { patientSearch } from './patientSearch';
+import { patientCreate } from './patientCreate';
+import { getClinicalSummary } from './getPatientClinicalSummary';
 
-var REDOX_API_KEY = process.env.API_KEY;
-var REDOX_API_SECRET = process.env.API_SECRET;
-var REDOX_AUTH_URL = 'https://api.redoxengine.com/auth/authenticate';
-var REDOX_API_URL = 'https://api.redoxengine.com/endpoint';
-
-export interface PatientParams {
-    firstName: string;
-    lastName: string;
-    dob: string;
-    gender: string;
-    email: string;
-    address: string;
-    city: string;
-    zip: string;
-    state: string;
-    patientid: string;
-    destinationId: string;
-    docid: string;
+export interface RequestParams {
+    firstName?: string;
+    lastName?: string;
+    dob?: string;
+    gender?: string;
+    email?: string;
+    address?: string;
+    city?: string;
+    zip?: string;
+    state?: string;
+    patientid?: string;
+    destinationid?: string;
+    docid?: string;
 }
 
 export const getAccessToken = async () => {
     const authConfig = {
-        url: REDOX_AUTH_URL,
+        url: 'https://api.redoxengine.com/auth/authenticate',
         headers: {
             'Content-Type': 'application/json'
         },
         json: true
     }
-    const auth_response = await axios.post(REDOX_AUTH_URL, {
-        apiKey: REDOX_API_KEY,
-        secret: REDOX_API_SECRET,
+    const auth_response = await axios.post('https://api.redoxengine.com/auth/authenticate', {
+        apiKey: process.env.REDOX_API_KEY,
+        secret: process.env.REDOX_API_SECRET,
     }, authConfig);
     const access_token = auth_response.data.accessToken;
 
     return access_token;
 }
 
-export const postToRedox = async (body: any) => {
-    const access_token = await getAccessToken();
+export const postToRedox = async (datamodelCommand: string, access_token: string, requestParams: RequestParams) => {
+    // const access_token = await getAccessToken();
+
+    const fn = ({
+        patientSearch: patientSearch,
+        patientCreate: patientCreate,
+        getClinicalSummary: getClinicalSummary
+    })[datamodelCommand];
+
+    const body: any = fn(requestParams);
 
     const config = {
         headers: {
@@ -47,57 +56,70 @@ export const postToRedox = async (body: any) => {
         },
         json: true
     }
-    const results = await axios.post(REDOX_API_URL, body, config)
+    const results = await axios.post('https://api.redoxengine.com/endpoint', body, config)
     return results.data;
 }
 
-export const ccdSearch = async (searchParams: PatientParams) => {
+export const getAdminAccessToken = async () => {
+    // (A) Generate JWT and sign it
+    const sign_request = {
+        iss: process.env.REDOX_ADMIN_CLIENT_ID,
+        sub: process.env.REDOX_ADMIN_CLIENT_ID,
+        aud: "https://api.redoxengine.com/v2/auth/token",
+        iat: Math.floor(new Date().getTime() / 1000),
+        exp: Math.floor(new Date().getTime() / 1000) + 300,
+        jti: crypto.randomBytes(8).toString("hex"), //random string nonce
+    };
+    const signed_jwt = jwt.sign(sign_request, process.env.REDOX_ADMIN_PRIVATE_KEY, {
+        algorithm: "RS384",
+        header: { "kid": process.env.REDOX_ADMIN_KEY_ID }
+    });
 
-    const dm = {
-        Meta: {
-            "DataModel": "Clinical Summary",
-            "EventType": "DocumentQuery",
-            "EventDateTime": new Date().toISOString(),
-            "Test": true,
-            "Destinations": [
-                {
-                    // "ID": 'ec745338-8849-43ad-a7ce-4bc5bf1d8b89',
-                    "ID": searchParams.destinationId
-                }
-            ],
-            // "FacilityCode": searchParams.destinationId,
-            "Extensions": {
-                "sender-organization-id": {
-                    "string": "2.16.840.1.113883.3.6147.458.8731.2.1"
-                },
-                "user-id": {
-                    "string": "Doolittle, John"
-                },
-                "user-role": {
-                    "coding": {
-                        "code": "112247003",
-                        "display": "Medical Doctor"
-                    }
-                },
-                "purpose-of-use": {
-                    "coding": {
-                        "code": "TREATMENT"
-                    }
-                }
-            }
-        },
-        Patient: {
-            "Identifiers": [{
-                "ID": searchParams.patientid,
-                "IDType": searchParams.destinationId
-            }
-            ]
+
+    // (B) Send signed JWT to Redox for an access_token
+    const body = qs.stringify({
+        grant_type: "client_credentials",
+        client_assertion_type:
+            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        client_assertion: signed_jwt
+    });
+    const config = {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
         }
-    }
-
-    const results = await postToRedox(dm);
-    return results;
+    };
+    const results = await axios.post('https://api.redoxengine.com/v2/auth/token', body, config);
+    return results.data.access_token;
 }
 
+export const getSubscriptions = async () => {
+    const access_token = await getAdminAccessToken();
+
+    const results = await axios.get(`https://api.redoxengine.com/platform/v0/organizations/${process.env.REDOX_ORG_ID}/subscriptions`, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+    });
+
+    return { response: results.data, error: '' };
+}
+
+export const getDestinations = async () => {
+    const { response, error } = await getSubscriptions();
+
+    let uniq = new Set();
+    let destinations = response.payload.subscriptions
+        .filter((sub) => sub.source.id === process.env.REDOX_SOURCE_ID)
+        .map((sub) => { return { ...sub.destination } })
+        .filter(d => {
+            const uniqVal = !uniq.has(d.id);
+            uniq.add(d.id);
+            return uniqVal;
+        });
+
+
+    return destinations;
+}
 
 
