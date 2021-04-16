@@ -71,9 +71,15 @@ export const register = (app: express.Application) => {
 
     try {
       if (destination && destination.dataModel.startsWith("FHIR.")) {
+
+        const slug = {
+            "2ed29f54-5e97-4d61-8522-f863698381ef": "redox-fhir-sandbox",
+            "3c29fafe-198a-4730-9099-78e599706e1d": "epic-fhir-sandbox"
+        }[destinationid];
+
         results = await postFHIR(
           "Patient",
-          "redox-fhir-sandbox",
+          slug,
           req.session.dev_token,
           req.body
         );

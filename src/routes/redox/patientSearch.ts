@@ -68,7 +68,6 @@ export const toFHIR = (requestParams: RequestParams) => {
 export const fromFHIR = (bundle: any) => {
   return {
     Patients: bundle.entry.map(({resource}) => {
-        console.log(resource)
       return {
         Identifiers: [{
             ID: resource.identifier[0].value
