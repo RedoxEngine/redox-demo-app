@@ -96,15 +96,15 @@ export const register = (app: express.Application) => {
       }
     } catch (e) {
       errorMessage = handleError(e);
-      console.error(errorMessage);
+    } finally {
+      res.render("patient", {
+        destinations: req.session.destinations,
+        search: req.body,
+        results,
+        errorMessage,
+      });
     }
 
-    res.render("patient", {
-      destinations: req.session.destinations,
-      search: req.body,
-      results,
-      errorMessage,
-    });
   });
 
   app.get("/patient-create", (req, res) => {
