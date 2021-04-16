@@ -8,6 +8,7 @@ declare module 'express-session' {
         destinations: { [key: string]: any };
         access_token: string;
         admin_access_token: string;
+        dev_token: string;
     }
 }
 
@@ -30,5 +31,5 @@ routes.register(app);
 // start the express server
 app.listen(port, () => {
     // tslint:disable-next-line:no-console
-    console.log(`server started`);
+    console.log(`server started http://localhost:${port}`);
 });
