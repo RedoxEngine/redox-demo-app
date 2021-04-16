@@ -70,18 +70,18 @@ export const fromFHIR = (bundle: any) => {
     Patients: bundle.entry.map(({resource}) => {
       return {
         Identifiers: [{
-            ID: resource.identifier[0].value
+            ID: resource.id
         }],
         Demographics: {
-          FirstName: resource.name[0].given,
-          LastName: resource.name[0].family,
+          FirstName: resource.name[0]?.given,
+          LastName: resource.name[0]?.family,
           DOB: resource.birthDate,
           Sex: resource.gender,
           Address: {
-            StreetAddress: resource.address[0].line.join('\n')
+            StreetAddress: resource.address[0]?.line.join('\n')
           },
           PhoneNumber: {
-              Home: resource.telecom[0].value
+              Home: resource.telecom && resource.telecom[0].value
           }
         },
 
