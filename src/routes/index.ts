@@ -161,7 +161,6 @@ export const register = (app: express.Application) => {
 
 const handleError = (err: any) => {
   let errorMessage;
-  console.error(err.response?.data);
   if (err.response?.data?.resourceType === "OperationOutcome") {
     errorMessage = err.response?.data?.issue[0]?.details?.text;
   } else if (err.response?.data?.Meta?.Errors?.[0]?.Text) {
