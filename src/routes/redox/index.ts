@@ -76,10 +76,10 @@ export const postFHIR = async (
   resource: string,
   sandboxSlug: string,
   access_token: string,
-  requestParams: RequestParams
+  requestParams: any
 ) => {
 
-  const body: any = qs.stringify(toFHIR(requestParams));
+  const body: any = qs.stringify(requestParams);
 
   const config = {
     headers: {
@@ -92,6 +92,27 @@ export const postFHIR = async (
   const results = await axios.post(
     `https://api.redoxengine.com/fhir/R4/${sandboxSlug}/Development/${resource}/_search`,
     body,
+    config
+  );
+  return results.data;
+};
+
+export const getFHIR = async (
+  resource: string,
+  sandboxSlug: string,
+  access_token: string,
+  id: string
+) => {
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+      "redox-source-id": process.env.REDOX_DEV_SOURCE_ID
+    },
+    json: true,
+  };
+  const results = await axios.get(
+    `https://api.redoxengine.com/fhir/R4/${sandboxSlug}/Development/${resource}/${id}`,
     config
   );
   return results.data;
