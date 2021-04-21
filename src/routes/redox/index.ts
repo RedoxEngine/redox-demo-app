@@ -47,7 +47,11 @@ export const postToRedox = async (
   access_token: string,
   requestParams: RequestParams
 ) => {
-  // const access_token = await getAccessToken();
+  if (!access_token) {
+    access_token = await getSourceAuthv2(
+      process.env.REDOX_API_KEY
+    );
+  }
 
   const fn = {
     patientSearch: patientSearch,
